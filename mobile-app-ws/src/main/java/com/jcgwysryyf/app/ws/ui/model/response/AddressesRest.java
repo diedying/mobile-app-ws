@@ -1,8 +1,10 @@
 package com.jcgwysryyf.app.ws.ui.model.response;
 
+import org.springframework.hateoas.ResourceSupport;
+
 import com.jcgwysryyf.app.ws.shared.dto.UserDto;
 
-public class AddressesRest {
+public class AddressesRest extends ResourceSupport{
 	
 	private String addressId;	
 	private String city;
