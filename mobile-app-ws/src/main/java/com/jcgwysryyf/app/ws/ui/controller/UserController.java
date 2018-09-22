@@ -3,6 +3,8 @@ package com.jcgwysryyf.app.ws.ui.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,9 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jcgwysryyf.app.ws.service.AddressService;
 import com.jcgwysryyf.app.ws.service.UserService;
+import com.jcgwysryyf.app.ws.shared.dto.AddressDTO;
 import com.jcgwysryyf.app.ws.shared.dto.UserDto;
 import com.jcgwysryyf.app.ws.ui.model.request.UserDetailsRequestModel;
+import com.jcgwysryyf.app.ws.ui.model.response.AddressesRest;
 import com.jcgwysryyf.app.ws.ui.model.response.OperationStatusModel;
 import com.jcgwysryyf.app.ws.ui.model.response.RequestOperationStatus;
 import com.jcgwysryyf.app.ws.ui.model.response.UserRest;
@@ -29,6 +34,12 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	AddressService addressesService;
+	
+	@Autowired
+	AddressService addressService;
 	
 	@GetMapping(path="/{id}",
 			produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
@@ -45,11 +56,19 @@ public class UserController {
 			)
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception{
 		UserRest returnValue = new UserRest();
+		
 		if(userDetails.getFirstName().isEmpty()) throw new Exception("required field is empty");
-		UserDto userDto = new UserDto();
-		BeanUtils.copyProperties(userDetails,userDto);
+		
+//		UserDto userDto = new UserDto();
+		ModelMapper modelMapper = new ModelMapper();
+		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
+		
+//		BeanUtils.copyProperties(userDetails,userDto);
+		
 		UserDto createdUser = userService.createUser(userDto);
-		BeanUtils.copyProperties(createdUser, returnValue);
+//		BeanUtils.copyProperties(createdUser, returnValue);
+		returnValue = modelMapper.map(createdUser, UserRest.class);
+		
 		return returnValue;
 	}
 	
@@ -95,6 +114,33 @@ public class UserController {
 		}
 		return returnValue;
 		
+	}
+	//http://localhost:8080/mobile-app-ws/users/fghj/addresses
+	@GetMapping(path="/{id}/addresses",
+			produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+	public List<AddressesRest> getAddress(@PathVariable String id) {
+		List<AddressesRest> returnValue = new ArrayList<AddressesRest>();
+		List<AddressDTO> addressesDto = addressesService.getAddresses(id);
+		
+		if(addressesDto!=null&&!addressesDto.isEmpty()) {
+			ModelMapper modelMapper = new ModelMapper();
+			java.lang.reflect.Type listType = new TypeToken<List<AddressesRest>>() {}.getType();
+			returnValue = modelMapper.map(addressesDto,listType);
+			
+		}
+		return returnValue;
+	}
+
+	// http://localhost:8080/mobile-app-ws/users/fghj/addresses
+	@GetMapping(path = "/{id}/addresses/{addressId}", produces = { MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public AddressesRest getUserAddress(@PathVariable String addressId) {
+		
+		AddressDTO addressDto = addressService.getAddress(addressId);
+
+		ModelMapper modelMapper = new ModelMapper();
+		
+		return modelMapper.map(addressDto, AddressesRest.class);
 	}
 
 }
