@@ -27,7 +27,7 @@ public class AmazonSES {
 	final String HTMLBODY = "<h1>Please verify your email address</h1>"
 			+ "<p>Thank you for registering with our mobile app. To complete registration process and be able to log in,"
 			+ " click on the following link: "
-			+ "<a href='http://http://ec2-34-203-195-113.compute-1.amazonaws.com:8080/verification-service/email-verification.html?token=$tokenValue'>"
+			+ "<a href='http://ec2-34-203-195-113.compute-1.amazonaws.com:8080/verification-service/email-verification.html?token=$tokenValue'>"
 			+ "Final step to complete your registration" + "</a><br/><br/>"
 			+ "Thank you! And we are waiting for you inside!";
 
